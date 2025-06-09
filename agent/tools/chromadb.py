@@ -8,7 +8,7 @@ from agent.tools.tool import Tool
 class ChromaDB(Tool):
     def __init__(self):
         super().__init__()
-        self.chroma_client = chromadb.HttpClient(host="localhost", port=8005)
+        self.chroma_client = chromadb.HttpClient(host="20.81.185.233", port=8005)
         self.collection = None
         
     def execute(self, workflow, inputs: List[float], context: Context, **kwargs) -> List[EmbeddedFile]:
