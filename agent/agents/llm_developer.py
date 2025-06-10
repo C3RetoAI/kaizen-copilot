@@ -41,7 +41,7 @@ class LLMDeveloper(AgentBase[FileInput, LLMDeveloperOutput]):
             )
                 
             message = client.messages.create(
-                model="claude-opus-4-20250514",
+                model="claude-3-5-haiku-20241022",
                 max_tokens=1024,
                 system="You are a professional software engineer. Your task is to fix the issue described by the user",
                 messages=[
