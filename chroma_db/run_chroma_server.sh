@@ -4,4 +4,4 @@
 # Mac / Linux: sh run_chroma_server.sh 
 # Windows: bash run_chroma_server.sh 
 
-chroma run --path ./db --host localhost --port 8005
+chroma run --path ./chroma_db/db --host localhost --port 8005
