@@ -44,7 +44,7 @@ def get_extension(language: str) -> Optional[str]:
 class QueryFormatter(AgentBase[QueryFormatterInput, QueryFormatterOutput]):
     def __init__(self):
         super().__init__()
-        self.aget_name: str = "QueryFormatter"
+        self.agent_name: str = "QueryFormatter"
         self.role: ROLE = ROLE.QUERY_FORMATTER
         self.purpose: str = "Format the issue to solve to create a properly query to find the files"
         pass
@@ -53,16 +53,19 @@ class QueryFormatter(AgentBase[QueryFormatterInput, QueryFormatterOutput]):
         self.context = context
         issue_description = input_data.issue.description
         self.context.issue = input_data.issue
-        match = re.search(r"```(?:\s*)(.*?)(?:\s*)```", issue_description, re.DOTALL)
+        # match = re.findall(r"```(?:\s*)(.*?)(?:\s*)```", issue_description, re.DOTALL)
+        # description = re.sub(r"```(?:\s*)(.*?)(?:\s*)```", issue_description, re.DOTALL)
 
-        if match:
-            code = match.group(1)
+        # if match:
+        #     code = match.group(1)
             
-            start, end = match.span()  
-            outside_text = (issue_description[:start] + issue_description[end:]).strip()  
+        #     start, end = match.span()  
+        #     outside_text = (issue_description[:start] + issue_description[end:]).strip()  
             
-            final_string = f"{outside_text}\n{code}"
+        #     final_string = f"{outside_text}\n{code}"
             
-            return QueryFormatterOutput(queries=[final_string], conditionals=None), self.context, 1
-        else:
-            return QueryFormatterOutput(queries=[issue_description], conditionals=None), self.context, 1
+        #     self.context.issue.code_snippets.append(code)
+            
+        #     return QueryFormatterOutput(queries=[final_string], conditionals=None), self.context, 1
+        # else:
+        return QueryFormatterOutput(queries=[issue_description], conditionals=None), self.context, 1

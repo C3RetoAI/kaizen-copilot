@@ -11,11 +11,10 @@ from agent.tools.chromadb import ChromaDB
 
 class EmbeddingModel(AgentBase[EmbeddingModelInput, FileBaseOutput]):
     def __init__(self):
-        self.aget_name: str = "EmbeddingModel"
+        self.agent_name: str = "EmbeddingModel"
         self.role: ROLE = ROLE.EMBEDDING
         self.tool: ChromaDB = ChromaDB()
         self.purpose: str = "Creates Embedding of the files to story or query in the vector database"
-        
         self.__model = SentenceTransformer('BAAI/bge-large-en')
         pass
     

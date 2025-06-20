@@ -14,9 +14,9 @@ from agent.tools.tool import Tool
 
 class FileResolver(AgentBase[FileInput, Union[FileBaseOutput, QueryFormatterOutput]]):
     def __init__(self):
-        self.aget_name: str = "FileResolver"
+        self.agent_name: str = "FileResolver"
         self.role: ROLE = ROLE.FILE_RESOLVER
-        self.tool: Tool = ChromaDB()
+        self.tool: Tool = None
         self.purpose: str = "Ensure LLM Model will have enough context, if not, it wil iterate with the Vector DB"
         self.__enable_context = False
     

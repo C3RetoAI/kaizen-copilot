@@ -4,6 +4,7 @@ import requests
 from agent.models.agentbase import AgentBase
 from agent.models.context import Context
 from typing import Optional, Tuple
+from openai import AzureOpenAI
 
 from agent.models.file import FILE_TYPE, File
 from agent.models.input import FileInput
@@ -13,26 +14,61 @@ import anthropic
 
 class LLMDeveloper(AgentBase[FileInput, LLMDeveloperOutput]):
     def __init__(self):
-        self.__model_endpoint = "http://localhost:11434/api/generate"
-        self.__payload = {"model": "qwen3:14b", "stream": False, "prompt": ""}
+        # self.__model_endpoint = "http://localhost:11434/api/generate"
+        # self.__payload = {"model": "qwen3:14b", "stream": False, "prompt": ""}
         self.context = None
         self.tool = None
         self.role = ROLE.DEVELOPER
         self.purpose = ""
         self.generate_patch = False
-        self.__api_key = os.environ.get('ANTHROPIC_KEY')
+        # self.__api_key = os.environ.get('ANTHROPIC_KEY')
         self.__enable_context = False
         pass
         
     def run(self, input_data: FileInput, context: Context) -> Tuple[LLMDeveloperOutput, Context, int]:
         self.context = context
         prompt = self.__format_prompt(input_data.files, context)
-        
-        fixed_code = self.__call_model(self.__api_key, prompt)
+        fixed_code = self.__call_openai(prompt)
+        # fixed_code = self.__call_model(self.__api_key, prompt)
 
         main_file = next((input_files for input_files in input_data.files if input_files.file_type == FILE_TYPE.MAIN_FILE), None)
         
         return LLMDeveloperOutput(fixed_code=fixed_code, path_code=main_file.path, comments=""), self.context, 1
+    
+    def __call_openai(self, prompt: str) -> str:
+        try:
+            client = AzureOpenAI(
+                api_version="2024-12-01-preview",
+                azure_endpoint="https://a0164-mbwrgbbz-swedencentral.cognitiveservices.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2025-01-01-preview",
+                api_key="8Bq2JHO8DkJTn9RkZc3EHfKWPt8Y6PbmpXe16PBQkNvfEcymLAnpJQQJ99BFACfhMk5XJ3w3AAAAACOGcPPG"
+            )
+                        
+            response = client.chat.completions.create(
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a professional software engineer. Your task is to analyze the issue description and the corresponding code provided. Return **only** a unified diff patch (in 'diff --git' format) that resolves the issue. Do not include explanations or extra text — only the patch."
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    }
+                ],
+                max_completion_tokens=800,
+                temperature=1.0,
+                top_p=1.0,
+                frequency_penalty=0.0,
+                presence_penalty=0.0,
+                model="gpt-4.1"
+            )
+            
+            print(response.choices[0].message.content)
+            
+            return response.choices[0].message.content
+        except Exception as e:
+            print("Error al llamar a OpenAI:", e)
+            raise
+        
    
     def __call_model(self, api_key: Optional[str], prompt: str) -> str:
         if api_key:
@@ -75,7 +111,7 @@ class LLMDeveloper(AgentBase[FileInput, LLMDeveloperOutput]):
                     
         issue_desciption = context.issue.description
         
-        string_context_files = "\n\n".join(context_files)
+        string_context_files = "\n\n".join(context_files[0])
         
         prompt = f"""
 Issue to solve:
